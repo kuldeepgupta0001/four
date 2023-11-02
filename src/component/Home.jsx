@@ -1,18 +1,27 @@
-import React from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
-
-const img1 =
-  "https://www.reliancedigital.in/medias/Apple-MGN63HNA-Laptops-491946461-i-1-1200Wx1200H?context=bWFzdGVyfGltYWdlc3wxNzczNDJ8aW1hZ2UvanBlZ3xpbWFnZXMvaDVhL2gyZC85NDQzMDgzNTgzNTE4LmpwZ3xhYzRiNWIxZGQ2NjNiNWIyYjI0Y2ZkYTZlZWQ3MTFjZTMxYzVmNDBiNmM5Mzk5OTM2OGVkZmExMjMyYjIxNDQ4";
-
-const img2 =
-  "https://cdn.shopify.com/s/files/1/2428/5565/products/Neemans-HaleBlack-ReLive-Knits-Jogger-FrontRightLogo-Comfortable-Shoes_1024x.jpg?v=1662876260";
+import Loader from "./Loader.jsx";
 
 const Home = () => {
-  const productList = [
-    { name: "MAc Book", price: 12000, imgSrc: img1, id: "aa" },
-    { name: "Black Shoes", price: 490, imgSrc: img2, id: "bb" },
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get(`https://fakestoreapi.com/products`);
+        setData(data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -23,14 +32,17 @@ const Home = () => {
     });
     toast.success("Added to cart");
   };
-  return (
+
+  return loading ? (
+    <Loader />
+  ) : (
     <div className="home">
-      {productList.map((i) => (
+      {data.map((i) => (
         <ProductCard
           key={i.id}
-          imgSrc={i.imgSrc}
-          name={i.name}
+          name={i.title}
           price={i.price}
+          imgSrc={i.image}
           id={i.id}
           handler={addTocartHandler}
         />
